@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Humidity Calculator</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(180deg,#1e3c72,#2a5298);
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+}
+
+.app{
+    width:100%;
+    max-width:420px;
+    height:90%;
+    background:#fff;
+    border-radius:30px 30px 0 0;
+    padding:25px;
+    box-shadow:0 -10px 40px rgba(0,0,0,0.3);
+    animation:slideUp .8s ease;
+    overflow-y:auto;
+}
+
+.logo-box{
+    display:flex;
+    justify-content:center;
+    margin-bottom:15px;
+}
+
+.logo-box img{
+    width:140px;
+    max-width:100%;
+    height:auto;
+    border-radius:18px;
+    background:#fff;
+    padding:8px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+}
+
+.header{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.header h1{
+    font-size:24px;
+    color:#1e3c72;
+}
+
+.header p{
+    margin-top:5px;
+    color:#666;
+    font-size:14px;
+}
+
+.field{
+    margin-top:18px;
+}
+
+.field label{
+    display:block;
+    margin-bottom:6px;
+    color:#555;
+    font-size:14px;
+}
+
+.field input{
+    width:100%;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:15px;
+    font-size:18px;
+    outline:none;
+}
+
+.field input:focus{
+    border-color:#2a5298;
+}
+
+button{
+    width:100%;
+    margin-top:25px;
+    padding:15px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg,#36d1dc,#5b86e5);
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.result{
+    margin-top:25px;
+    padding:20px;
+    border-radius:20px;
+    background:#f3f6ff;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    color:#2a5298;
+    min-height:80px;
+}
+
+.footer{
+    margin-top:15px;
+    text-align:center;
+    font-size:12px;
+    color:#888;
+}
+
+.creator{
+    margin-top:20px;
+    padding:18px;
+    text-align:center;
+    border-radius:20px;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    color:white;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+.creator span{
+    display:block;
+    font-size:12px;
+    letter-spacing:3px;
+    opacity:.8;
+    text-transform:uppercase;
+}
+
+.creator h3{
+    margin-top:8px;
+    font-size:20px;
+}
+
+@keyframes slideUp{
+    from{
+        transform:translateY(100%);
+    }
+    to{
+        transform:translateY(0);
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="header">
+
+        <div class="logo-box">
+            <img src="itc-logo.png" alt="ITC Limited">
+        </div>
+
+        <h1>💧 Humidity Calculator</h1>
+        <p>Exact Psychrometric Method</p>
+
+    </div>
+
+    <div class="field">
+        <label>Dry Bulb Temperature (°C)</label>
+        <input type="number" id="dry" placeholder="Enter Dry Bulb Temp">
+    </div>
+
+    <div class="field">
+        <label>Wet Bulb Temperature (°C)</label>
+        <input type="number" id="wet" placeholder="Enter Wet Bulb Temp">
+    </div>
+
+    <button onclick="calculateRH()">
+        Calculate Relative Humidity
+    </button>
+
+    <div class="result" id="result">
+        Enter temperatures above
+    </div>
+
+    <div class="footer">
+        Accurate • Weather-grade Formula
+    </div>
+
+    <div class="creator">
+        <span>Made By</span>
+        <h3>Mohammad Munaf Ahmad</h3>
+    </div>
+
+</div>
+
+<script>
+
+function saturationVaporPressure(T){
+    return 6.112 * Math.exp((17.62 * T) / (243.12 + T));
+}
+
+function calculateRH(){
+
+    const Td = parseFloat(document.getElementById("dry").value);
+    const Tw = parseFloat(document.getElementById("wet").value);
+
+    const result = document.getElementById("result");
+
+    if(isNaN(Td) || isNaN(Tw)){
+        result.innerHTML = "❌ Enter valid values";
+        return;
+    }
+
+    if(Tw > Td){
+        result.innerHTML = "❌ Wet bulb temperature cannot exceed dry bulb temperature";
+        return;
+    }
+
+    const P = 1013;
+
+    const esWet = saturationVaporPressure(Tw);
+    const esDry = saturationVaporPressure(Td);
+
+    const gamma = 0.00066 * (1 + 0.00115 * Tw) * P;
+
+    const e = esWet - gamma * (Td - Tw);
+
+    let RH = (e / esDry) * 100;
+
+    RH = Math.max(0, Math.min(100, RH));
+
+    result.innerHTML =
+    "💧 Relative Humidity<br><br>" +
+    RH.toFixed(2) + "%";
+
+}
+
+</script>
+
+</body>
+  </html>
